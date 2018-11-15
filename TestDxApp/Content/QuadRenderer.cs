@@ -41,7 +41,6 @@ namespace TestDxApp.Content
         private RenderTarget renderTarget;
         private Brush redBrush;
         private Brush whiteBrush;
-        private Brush blueBrush;
         private TextFormat textFormat;
         private Ellipse ellipse;
         private RawRectangleF fillRectangle;
@@ -159,10 +158,8 @@ namespace TestDxApp.Content
 
             renderTarget.BeginDraw();
 
-            renderTarget.FillRectangle(this.fillRectangle, this.whiteBrush);
-
             renderTarget.DrawText($"{this.totalTicks} ticks", this.textFormat,
-                this.textRectangle, this.blueBrush, DrawTextOptions.Clip);
+                this.textRectangle, this.whiteBrush, DrawTextOptions.Clip);
 
             renderTarget.FillEllipse(this.ellipse, this.redBrush);
 
@@ -324,8 +321,6 @@ namespace TestDxApp.Content
 
             this.whiteBrush = this.ToDispose(new SolidColorBrush(renderTarget, new RawColor4(255, 255, 255, 255)));
 
-            this.blueBrush = this.ToDispose(new SolidColorBrush(renderTarget, new RawColor4(0, 0, 255, 255)));
-
             this.textFormat = this.ToDispose(new TextFormat(this.deviceResources.DWriteFactory, "Consolas", 24));
 
             this.ellipse = new Ellipse(new RawVector2(TEXTURE_SIZE / 2, TEXTURE_SIZE / 2), TEXTURE_SIZE / 4, TEXTURE_SIZE / 4);
@@ -346,7 +341,6 @@ namespace TestDxApp.Content
 
             this.RemoveAndDispose(ref this.redBrush);
             this.RemoveAndDispose(ref this.whiteBrush);
-            this.RemoveAndDispose(ref this.blueBrush);
             this.RemoveAndDispose(ref this.textFormat);
             this.RemoveAndDispose(ref this.samplerState);
             this.RemoveAndDispose(ref this.texture2D);
