@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2003
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDxApp", "TestDxApp.csproj", "{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Debug|x64.ActiveCfg = Debug|x64
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Debug|x64.Build.0 = Debug|x64
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Debug|x64.Deploy.0 = Debug|x64
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Debug|x86.ActiveCfg = Debug|x86
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Debug|x86.Build.0 = Debug|x86
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Debug|x86.Deploy.0 = Debug|x86
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Release|x64.ActiveCfg = Release|x64
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Release|x64.Build.0 = Release|x64
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Release|x64.Deploy.0 = Release|x64
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Release|x86.ActiveCfg = Release|x86
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Release|x86.Build.0 = Release|x86
+		{0A6C88DF-6E21-43B7-87C1-2C9A58B8C4C3}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {51C093E6-2905-4517-8FBC-397673B7332A}
+	EndGlobalSection
+EndGlobal
