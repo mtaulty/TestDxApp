@@ -22,6 +22,7 @@ namespace TestDxApp.Content
         private SharpDX.Direct3D11.InputLayout inputLayout;
         private SharpDX.Direct3D11.Buffer vertexBuffer;
         private SharpDX.Direct3D11.Buffer indexBuffer;
+        private SharpDX.Direct3D11.GeometryShader geometryShader;
         private SharpDX.Direct3D11.VertexShader vertexShader;
         private SharpDX.Direct3D11.PixelShader pixelShader;
         private SharpDX.Direct3D11.Buffer modelConstantBuffer;
@@ -46,6 +47,10 @@ namespace TestDxApp.Content
         private RawRectangleF fillRectangle;
         private RawRectangleF textRectangle;
         private int totalTicks;
+
+        // If the current D3D Device supports VPRT, we can avoid using a geometry
+        // shader just to set the render target array index.
+        private bool usingVprtShaders = false;
 
         /// <summary>
         /// Loads vertex and pixel shaders from files and instantiates the cube geometry.
@@ -151,6 +156,15 @@ namespace TestDxApp.Content
             // Apply the model constant buffer to the vertex shader.
             context.VertexShader.SetConstantBuffers(0, this.modelConstantBuffer);
 
+            if (!this.usingVprtShaders)
+            {
+                // On devices that do not support the D3D11_FEATURE_D3D11_OPTIONS3::
+                // VPAndRTArrayIndexFromAnyShaderFeedingRasterizer optional feature,
+                // a pass-through geometry shader is used to set the render target 
+                // array index.
+                context.GeometryShader.SetShader(this.geometryShader, null, 0);
+            }
+
             // Attach the pixel shader.
             context.PixelShader.SetShaderResource(0, this.shaderResourceView);
             context.PixelShader.SetSampler(0, this.samplerState);
@@ -184,6 +198,8 @@ namespace TestDxApp.Content
         {
             ReleaseDeviceDependentResources();
 
+            usingVprtShaders = deviceResources.D3DDeviceSupportsVprt;
+
             var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 
             // On devices that do support the D3D11_FEATURE_D3D11_OPTIONS3::
@@ -191,7 +207,9 @@ namespace TestDxApp.Content
             // we can avoid using a pass-through geometry shader to set the render
             // target array index, thus avoiding any overhead that would be 
             // incurred by setting the geometry shader stage.
-            var vertexShaderFileName = "Content\\Shaders\\VPRTVertexShader.cso";
+            var vertexShaderFileName =
+                usingVprtShaders ? "Content\\Shaders\\VPRTVertexShader.cso" : 
+                    "Content\\Shaders\\VertexShader.cso";
 
             // Load the compiled vertex shader.
             var vertexShaderByteCode = await DirectXHelper.ReadDataAsync(
@@ -206,14 +224,24 @@ namespace TestDxApp.Content
             SharpDX.Direct3D11.InputElement[] vertexDesc =
             {
                 new SharpDX.Direct3D11.InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float,  0, 0, SharpDX.Direct3D11.InputClassification.PerVertexData, 0),
-                new SharpDX.Direct3D11.InputElement("TEXCOORD",    0, SharpDX.DXGI.Format.R32G32_Float, 12, 0, SharpDX.Direct3D11.InputClassification.PerVertexData, 0),
-                new SharpDX.Direct3D11.InputElement("COLOR",    0, SharpDX.DXGI.Format.R32G32B32_Float, 20, 0, SharpDX.Direct3D11.InputClassification.PerVertexData, 0),
+                new SharpDX.Direct3D11.InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0, SharpDX.Direct3D11.InputClassification.PerVertexData, 0)
             };
 
             inputLayout = this.ToDispose(new SharpDX.Direct3D11.InputLayout(
                 deviceResources.D3DDevice,
                 vertexShaderByteCode,
                 vertexDesc));
+
+            if (!usingVprtShaders)
+            {
+                // Load the compiled pass-through geometry shader.
+                var geometryShaderByteCode = await DirectXHelper.ReadDataAsync(await folder.GetFileAsync("Content\\Shaders\\GeometryShader.cso"));
+
+                // After the pass-through geometry shader file is loaded, create the shader.
+                geometryShader = this.ToDispose(new SharpDX.Direct3D11.GeometryShader(
+                    deviceResources.D3DDevice,
+                    geometryShaderByteCode));
+            }
 
             // Load the compiled pixel shader.
             var pixelShaderByteCode = await DirectXHelper.ReadDataAsync(
@@ -282,12 +310,12 @@ namespace TestDxApp.Content
             Texture2DDescription desc = new Texture2DDescription()
             {
                 Width = TEXTURE_SIZE,
-                Height = 640,
+                Height = TEXTURE_SIZE,
                 ArraySize = 1,
                 MipLevels = 1,
                 Usage = ResourceUsage.Default,
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
-                CpuAccessFlags = CpuAccessFlags.Write | CpuAccessFlags.Read,
+                CpuAccessFlags = CpuAccessFlags.None,
                 SampleDescription = new SampleDescription(1, 0),
                 BindFlags = BindFlags.RenderTarget | BindFlags.ShaderResource
             };
@@ -338,6 +366,7 @@ namespace TestDxApp.Content
         public void ReleaseDeviceDependentResources()
         {
             loadingComplete = false;
+            usingVprtShaders = false;
 
             this.RemoveAndDispose(ref this.redBrush);
             this.RemoveAndDispose(ref this.whiteBrush);
