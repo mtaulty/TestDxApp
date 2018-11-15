@@ -35,7 +35,7 @@ namespace TestDxApp
 #if DRAW_SAMPLE_CONTENT
         // Renders a colorful holographic cube that's 20 centimeters wide. This sample content
         // is used to demonstrate world-locked rendering.
-        private SpinningCubeRenderer        spinningCubeRenderer;
+        private QuadRenderer quadRenderer;
         
         private SpatialInputHandler         spatialInputHandler;
 #endif
@@ -93,7 +93,7 @@ namespace TestDxApp
 
 #if DRAW_SAMPLE_CONTENT
             // Initialize the sample hologram.
-            spinningCubeRenderer = new SpinningCubeRenderer(deviceResources);
+            quadRenderer = new QuadRenderer(deviceResources);
 
             spatialInputHandler = new SpatialInputHandler();
 #endif
@@ -141,10 +141,10 @@ namespace TestDxApp
         public void Dispose()
         {
 #if DRAW_SAMPLE_CONTENT
-            if (spinningCubeRenderer != null)
+            if (quadRenderer != null)
             {
-                spinningCubeRenderer.Dispose();
-                spinningCubeRenderer = null;
+                quadRenderer.Dispose();
+                quadRenderer = null;
             }
 #endif
         }
@@ -197,7 +197,7 @@ namespace TestDxApp
 
             // When a Pressed gesture is detected, the sample hologram will be repositioned
             // two meters in front of the user.
-            spinningCubeRenderer.PositionHologram(pose);
+            quadRenderer.PositionHologram(pose);
 #endif
 
             timer.Tick(() => 
@@ -211,7 +211,7 @@ namespace TestDxApp
                 //
 
 #if DRAW_SAMPLE_CONTENT
-                spinningCubeRenderer.Update(timer);
+                quadRenderer.Update(timer);
 #endif
             });
 
@@ -234,7 +234,7 @@ namespace TestDxApp
                 // hologram is at a fixed point so we only need to indicate its position.
                 renderingParameters.SetFocusPoint(
                     currentCoordinateSystem,
-                    spinningCubeRenderer.Position
+                    quadRenderer.Position
                     );
 #endif
             }
@@ -330,7 +330,7 @@ namespace TestDxApp
                     if (cameraActive)
                     {
                         // Draw the sample hologram.
-                        spinningCubeRenderer.Render();
+                        quadRenderer.Render();
                     }
 #endif
                     atLeastOneCameraRendered = true;
@@ -372,7 +372,7 @@ namespace TestDxApp
         {
 
 #if DRAW_SAMPLE_CONTENT
-            spinningCubeRenderer.ReleaseDeviceDependentResources();
+            quadRenderer.ReleaseDeviceDependentResources();
 #endif
 
         }
@@ -383,7 +383,7 @@ namespace TestDxApp
         public void OnDeviceRestored(Object sender, EventArgs e)
         {
 #if DRAW_SAMPLE_CONTENT
-            spinningCubeRenderer.CreateDeviceDependentResourcesAsync();
+            quadRenderer.CreateDeviceDependentResourcesAsync();
 #endif
         }
 

@@ -25,6 +25,7 @@ namespace TestDxApp.Common
         private DeviceContext3                  d3dContext;
         private SharpDX.DXGI.Adapter3           dxgiAdapter;
 
+
         // Direct3D interop objects.
         private IDirect3DDevice                 d3dInteropDevice;
 

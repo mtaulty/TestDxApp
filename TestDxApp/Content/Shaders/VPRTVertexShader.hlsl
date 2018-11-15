@@ -2,7 +2,7 @@
 struct VertexShaderOutput
 {
     min16float4 pos     : SV_POSITION;
-    min16float3 color   : COLOR0;
+    min16float2 texCoord : TEXCOORD;
 
     // The render target array index is set here in the vertex shader.
     uint        viewId  : SV_RenderTargetArrayIndex;

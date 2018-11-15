@@ -13,15 +13,17 @@ namespace TestDxApp.Content
     /// <summary>
     /// Used to send per-vertex data to the vertex shader.
     /// </summary>
-    internal struct VertexPositionColor
+    internal struct VertexPositionTextureColor
     {
-        public VertexPositionColor(Vector3 pos, Vector3 color)
+        public VertexPositionTextureColor(Vector3 pos, Vector2 textCoord, Vector3 color)
         {
             this.pos   = pos;
+            this.textCoord = textCoord;
             this.color = color;
         }
 
         public Vector3 pos;
+        public Vector2 textCoord;
         public Vector3 color;
     };
 }
