@@ -52,6 +52,11 @@ namespace TestDxApp.Content
         // shader just to set the render target array index.
         private bool usingVprtShaders = false;
 
+        private float scaleValue = 1.0f;
+        private float scaleIncrement = SCALE_INCREMENT;
+        private float rotation = 0.0f;
+        private DateTime updateRotationTime = DateTime.Now;
+
         /// <summary>
         /// Loads vertex and pixel shaders from files and instantiates the cube geometry.
         /// </summary>
@@ -172,10 +177,12 @@ namespace TestDxApp.Content
 
             renderTarget.BeginDraw();
 
-            renderTarget.DrawText($"{this.totalTicks} ticks", this.textFormat,
-                this.textRectangle, this.whiteBrush, DrawTextOptions.Clip);
+            this.SetRotationAndScale();
 
             renderTarget.FillEllipse(this.ellipse, this.redBrush);
+
+            renderTarget.DrawText($"{this.totalTicks} ticks", this.textFormat,
+                this.textRectangle, this.whiteBrush, DrawTextOptions.Clip);
 
             renderTarget.EndDraw();
 
@@ -188,7 +195,35 @@ namespace TestDxApp.Content
                 0               // Start instance location.
                 );
         }
+        void SetRotationAndScale()
+        {
+            // Pure laziness...
+            var now = DateTime.Now;
 
+            if ((now - this.updateRotationTime).TotalMilliseconds >= SCALE_ROTATION_TIME_MSECS)
+            {
+                this.updateRotationTime = now;
+
+                this.rotation += ROTATION_INCREMENT;
+
+                if ((this.scaleValue >= SCALE_MAX) || (this.scaleValue <= SCALE_MIN))
+                {
+                    this.scaleIncrement = 0 - this.scaleIncrement;
+                }
+                this.scaleValue += this.scaleIncrement;
+            }
+
+            var centrePoint = new Vector2(TEXTURE_SIZE / 2.0f, TEXTURE_SIZE / 2.0f);
+
+            var rotation = Matrix3x2.CreateRotation(this.rotation, centrePoint);
+
+            var scale = Matrix3x2.CreateScale(this.scaleValue, centrePoint);
+
+            scale *= rotation;
+
+            this.renderTarget.Transform = new RawMatrix3x2(
+                scale.M11, scale.M12, scale.M21, scale.M22, scale.M31, scale.M32);
+        }
         /// <summary>
         /// Creates device-based resources to store a constant buffer, cube
         /// geometry, and vertex and pixel shaders. In some cases this will also 
@@ -208,7 +243,7 @@ namespace TestDxApp.Content
             // target array index, thus avoiding any overhead that would be 
             // incurred by setting the geometry shader stage.
             var vertexShaderFileName =
-                usingVprtShaders ? "Content\\Shaders\\VPRTVertexShader.cso" : 
+                usingVprtShaders ? "Content\\Shaders\\VPRTVertexShader.cso" :
                     "Content\\Shaders\\VertexShader.cso";
 
             // Load the compiled vertex shader.
@@ -392,5 +427,10 @@ namespace TestDxApp.Content
         }
         static readonly int TEXTURE_SIZE = 720;
         static readonly float QUAD_SIZE = 1.0f;
+        static readonly float SCALE_MIN = 0.25f;
+        static readonly float SCALE_MAX = 3.0f;
+        static readonly float ROTATION_INCREMENT = (float)Math.PI / 30.0f;
+        static readonly float SCALE_INCREMENT = 0.1f;
+        static readonly int SCALE_ROTATION_TIME_MSECS = 100;
     }
 }
